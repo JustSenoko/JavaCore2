@@ -4,18 +4,17 @@ import ru.geekbrains.lesson1.participants.Participant;
 
 public abstract class Animal implements Participant {
 
-    private String name;
-    double maxRunLength;
-    double maxJumpHeight;
-    double maxSwimLength;
-    boolean onDistance;
+    String name;
+    private double maxRunLength;
+    private double maxJumpHeight;
+    private double maxSwimLength;
+    boolean onDistance = true;
 
-    public Animal(String name, double maxRunLength, double maxJumpHeight, double maxSwimLength) {
+    Animal(String name, double maxRunLength, double maxJumpHeight, double maxSwimLength) {
         this.name = name;
         this.maxRunLength = maxRunLength;
         this.maxSwimLength = maxSwimLength;
         this.maxJumpHeight = maxJumpHeight;
-        this.onDistance = true;
     }
 
     @Override
@@ -25,31 +24,35 @@ public abstract class Animal implements Participant {
 
     @Override
     public void getInfo(boolean showSkills) {
-        String skills = "";
+        StringBuilder skills = new StringBuilder(" (");
         if (showSkills) {
+            skills.append(" (");
             if (this.maxRunLength > 0) {
-                skills += "бегает на " + this.maxRunLength + " м";
+                skills.append("бегает на ");
+                skills.append(this.maxRunLength);
+                skills.append(" м");
             } else {
-                skills += "не бегает";
+                skills.append("не бегает");
             }
-            skills += ", ";
+            skills.append(", ");
             if (this.maxJumpHeight > 0) {
-                skills += "прыгает на " + this.maxJumpHeight + " м";
+                skills.append("прыгает на ");
+                skills.append(this.maxJumpHeight);
+                skills.append(" м");
             } else {
-                skills += "не прыгает";
+                skills.append("не прыгает");
             }
+            skills.append(", ");
             if (this.maxSwimLength > 0) {
-                skills += "плавает на " + this.maxSwimLength + " м";
+                skills.append("плавает на ");
+                skills.append(this.maxSwimLength);
+                skills.append(" м");
             } else {
-                skills += "не плавает";
+                skills.append("не плавает");
             }
-            skills = " (" + skills + ")";
+            skills.append(")");
         }
         System.out.println(this.name + skills);
-    }
-
-    String getName(){
-        return this.name;
     }
 
     @Override
@@ -80,6 +83,7 @@ public abstract class Animal implements Participant {
             } else {
                 System.out.println(length + "м - это слишком " + errorText + " для меня");
                 this.onDistance = false;
+                System.out.println(this.name + " сошел с дистанции");
             }
         }
         return false;
