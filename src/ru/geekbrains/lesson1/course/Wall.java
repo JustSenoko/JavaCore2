@@ -1,17 +1,15 @@
 package ru.geekbrains.lesson1.course;
 
-import ru.geekbrains.lesson1.Participant;
+import ru.geekbrains.lesson1.participants.Participant;
 
 public class Wall extends Obstacle {
 
-    private int height;
-
-    public Wall(int height) {
-        this.height = height;
+    public Wall(double height) {
+        super(height);
     }
 
     @Override
     public void doIt(Participant participant) {
-        participant.jump(this.height);
+        participant.jump(this.size);
     }
 }

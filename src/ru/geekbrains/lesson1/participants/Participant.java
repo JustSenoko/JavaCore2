@@ -12,4 +12,6 @@ public interface Participant {
     void jump(double height);
 
     void swim(double distance);
+
+    void getInfo(boolean showSkills);
 }

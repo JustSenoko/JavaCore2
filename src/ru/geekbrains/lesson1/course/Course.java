@@ -1,7 +1,7 @@
 package ru.geekbrains.lesson1.course;
 
-import ru.geekbrains.lesson1.Participant;
 import ru.geekbrains.lesson1.Team;
+import ru.geekbrains.lesson1.participants.Participant;
 
 /**
  * Класс - полоса препятствий
@@ -15,7 +15,10 @@ public class Course {
     }
 
     public void doIt(Team team) {
+        System.out.println("СТАРТ!");
+        System.out.println();
         for (Participant participant : team.getParticipants()) {
+            participant.getInfo(true);
             for (Obstacle obstacle : obstacles) {
                 obstacle.doIt(participant);
 
@@ -24,6 +27,7 @@ public class Course {
                     break;
                 }
             }
+            System.out.println();
         }
     }
 }

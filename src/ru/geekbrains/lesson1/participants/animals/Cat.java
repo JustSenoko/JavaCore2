@@ -16,5 +16,6 @@ public class Cat extends Animal {
     public void swim(double distance) {
         this.onDistance = false;
         System.out.println("у меня лапки!");
+        System.out.println(this.name + " сошел с дистанции");
     }
 }
