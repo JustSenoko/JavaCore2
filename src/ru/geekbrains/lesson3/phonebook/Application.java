@@ -20,8 +20,7 @@ public class Application {
 
     private static void printPhones(String name) {
         List<Record> records = phonebook.get(name);
-        System.out.printf("%s: ", name
-        );
+        System.out.printf("%s: ", name);
         if (records.size() == 0) {
             System.out.println("номер не найден");
             return;

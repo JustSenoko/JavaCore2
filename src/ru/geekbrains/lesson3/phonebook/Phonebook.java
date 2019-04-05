@@ -7,10 +7,10 @@ class Phonebook {
 
     void add(String name, String phone) {
         List<Record> records = new ArrayList<>();
-        if (phonebook.containsKey(name)) {
-            records = phonebook.get(name);
-        }
+        phonebook.putIfAbsent(name, records);
+        records = phonebook.get(name);
         records.add(new Record(name, phone));
+
         phonebook.put(name, records);
     }
 
