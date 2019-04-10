@@ -1,4 +1,4 @@
-package ru.geekbrains.lesson4.fxml;
+package ru.geekbrains.lesson4;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

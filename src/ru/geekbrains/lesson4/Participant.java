@@ -1,4 +1,4 @@
-package ru.geekbrains.lesson4.fxml;
+package ru.geekbrains.lesson4;
 
 public class Participant {
     private String name;

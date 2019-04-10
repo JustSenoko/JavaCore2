@@ -5,8 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import ru.geekbrains.lesson4.*;
 
-public class Main extends Application {
+public class ApplicationFXML extends Application {
 
     public static void main(String[] args) {
 
