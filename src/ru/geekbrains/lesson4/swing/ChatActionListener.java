@@ -7,26 +7,26 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ChatActionListener implements ActionListener {
-    private JTextField txtMessage;
-    private JTextArea txtChatArea;
+    private JTextField msgField;
+    private JTextArea chatArea;
     private Chat chat;
     private Participant participant;
 
-    ChatActionListener(JTextField txtMessage, JTextArea txtChatArea, Chat chat, Participant participant) {
-        this.txtMessage = txtMessage;
-        this.txtChatArea = txtChatArea;
+    ChatActionListener(JTextField msgField, JTextArea chatArea, Chat chat, Participant participant) {
+        this.msgField = msgField;
+        this.chatArea = chatArea;
         this.chat = chat;
         this.participant = participant;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String msg = txtMessage.getText();
+        String msg = msgField.getText();
         if (msg.equals("")) {
             return;
         }
         chat.addMessage(this.participant, msg);
-        txtChatArea.setText(chat.getRecordsAsString());
-        txtMessage.setText("");
+        chatArea.setText(chat.getRecordsAsString());
+        msgField.setText("");
     }
 }

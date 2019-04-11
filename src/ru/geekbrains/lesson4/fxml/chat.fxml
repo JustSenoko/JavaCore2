@@ -12,16 +12,15 @@
    <bottom>
       <HBox prefHeight="26.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <TextField fx:id="txtMessage" onAction="#sendMessage" prefHeight="26.0" prefWidth="241.0" promptText="Написать сообщение..." />
-         <Button fx:id="btnSend" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#sendMessage" prefHeight="26.0" prefWidth="104.0" style="-fx-background-image: url(img/send-24.png);" text="Отправить" textAlignment="CENTER">
+         <Button fx:id="btnSend" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#sendMessage" prefHeight="26.0" prefWidth="104.0" text="Отправить" textAlignment="CENTER">
             <font>
                <Font name="System Bold" size="12.0" />
             </font>
          </Button>
-
       </HBox>
    </bottom>
    <center>
-      <TextArea fx:id="txtChatArea" editable="false" nodeOrientation="RIGHT_TO_LEFT" prefHeight="216.0" prefWidth="271.0" promptText="WELCOME" style="-fx-background-color: #DCE1E5;" BorderPane.alignment="CENTER" />
+      <TextArea fx:id="txtChatArea" editable="false" nodeOrientation="RIGHT_TO_LEFT" prefHeight="216.0" prefWidth="271.0" promptText="WELCOME" style="-fx-background-color: #DCE1E5;" wrapText="true" BorderPane.alignment="CENTER" />
    </center>
    <top>
       <Label fx:id="lblChatName" style="-fx-background-color: #fafafa;" text="Чат" BorderPane.alignment="CENTER" />

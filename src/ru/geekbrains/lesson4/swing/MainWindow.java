@@ -24,8 +24,6 @@ class MainWindow extends JFrame {
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(scroll, BorderLayout.CENTER);
 
-
-
         JPanel sendMessagePanel = new JPanel();
         sendMessagePanel.setLayout(new BorderLayout());
 
