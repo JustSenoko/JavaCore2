@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import ru.geekbrains.lesson4.Chat;
-import ru.geekbrains.lesson4.Participant;
+import ru.geekbrains.lesson4.ChatUser;
 
 public class ChatController {
     public TextArea txtChatArea;
@@ -15,7 +15,7 @@ public class ChatController {
     public Button btnSend;
 
     private Chat chat;
-    private Participant participant;
+    private ChatUser chatUser;
 
     void setChat(Chat chat) {
 
@@ -23,8 +23,8 @@ public class ChatController {
         lblChatName.setText(chat.getName());
     }
 
-    public void setParticipant(Participant participant) {
-        this.participant = participant;
+    public void setChatUser(ChatUser chatUser) {
+        this.chatUser = chatUser;
     }
 
     public void sendMessage(ActionEvent actionEvent) {
@@ -37,7 +37,7 @@ public class ChatController {
         if (msg.equals("")) {
             return;
         }
-        chat.addMessage(this.participant, msg);
+        chat.addMessage(this.chatUser, msg);
         txtChatArea.setText(chat.getRecordsAsString());
         txtMessage.setText("");
     }

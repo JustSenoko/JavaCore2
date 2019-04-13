@@ -21,7 +21,7 @@ public class ApplicationFXML extends Application {
 
         ChatController chatController = loader.getController();
         chatController.setChat(new Chat());
-        chatController.setParticipant(new Participant("я"));
+        chatController.setChatUser(new ChatUser("я"));
 
         primaryStage.setTitle("Чат");
         primaryStage.setScene(new Scene(root, 300, 275));

@@ -1,9 +1,9 @@
 package ru.geekbrains.lesson4;
 
-public class Participant {
+public class ChatUser {
     private String name;
 
-    public Participant(String name) {
+    public ChatUser(String name) {
         this.name = name;
     }
 

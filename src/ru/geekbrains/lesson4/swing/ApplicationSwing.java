@@ -1,16 +1,14 @@
 package ru.geekbrains.lesson4.swing;
 
-import ru.geekbrains.lesson4.Chat;
-import ru.geekbrains.lesson4.Participant;
+import ru.geekbrains.lesson4.ChatUser;
 
 import javax.swing.*;
 
 public class ApplicationSwing {
 
     public static void main(String[] args) {
-        Chat chat = new Chat();
-        Participant participant = new Participant("я");
+        ChatUser chatUser = new ChatUser("вы");
 
-        SwingUtilities.invokeLater(() -> new MainWindow(chat, participant));
+        SwingUtilities.invokeLater(() -> new MainWindow(chatUser));
     }
 }

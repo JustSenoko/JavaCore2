@@ -1,21 +1,33 @@
 package ru.geekbrains.lesson4;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ChatRecord {
-    private Participant participant;
+    private ChatUser chatUser;
     private String message;
-    private Date date;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+    private LocalDateTime date;
 
-    ChatRecord(Participant participant, String message) {
-        this.participant = participant;
+    public ChatRecord(ChatUser chatUser, String message) {
+        this.chatUser = chatUser;
         this.message = message;
-        this.date = new Date();
+        this.date = LocalDateTime.now();
+    }
+
+    public ChatUser getUser() {
+        return chatUser;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getDateFormatted() {
+        String formatPattern = "HH:mm";
+        return date.format(DateTimeFormatter.ofPattern(formatPattern));
     }
 
     public String toString() {
-        return String.format("%s: %s    %s%n", participant.getName(), message, dateFormat.format(date));
+        return String.format("%s: %s    %s%n", chatUser.getName(), message, getDateFormatted());
     }
 }

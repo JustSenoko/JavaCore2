@@ -15,9 +15,9 @@ public class Chat {
         return name;
     }
 
-    public void addMessage(Participant participant, String message) {
+    public void addMessage(ChatUser chatUser, String message) {
 
-        this.chat.add(new ChatRecord(participant, message));
+        this.chat.add(new ChatRecord(chatUser, message));
     }
 
     public String getRecordsAsString() {
