@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.geekbrains.lesson4.fxml.ChatController">
+   <bottom>
+      <HBox prefHeight="26.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <TextField fx:id="txtMessage" onAction="#sendMessage" prefHeight="26.0" prefWidth="241.0" promptText="Написать сообщение..." />
+         <Button fx:id="btnSend" contentDisplay="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#sendMessage" prefHeight="26.0" prefWidth="104.0" text="Отправить" textAlignment="CENTER">
+            <font>
+               <Font name="System Bold" size="12.0" />
+            </font>
+         </Button>
+      </HBox>
+   </bottom>
+   <center>
+      <TextArea fx:id="txtChatArea" editable="false" nodeOrientation="RIGHT_TO_LEFT" prefHeight="216.0" prefWidth="271.0" promptText="WELCOME" style="-fx-background-color: #DCE1E5;" wrapText="true" BorderPane.alignment="CENTER" />
+   </center>
+   <top>
+      <Label fx:id="lblChatName" style="-fx-background-color: #fafafa;" text="Чат" BorderPane.alignment="CENTER" />
+   </top>
+</BorderPane>
