@@ -4,11 +4,11 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class InputStream implements Runnable{
+public class ChatInputStream implements Runnable{
 
     private Socket socket;
 
-    InputStream(Socket socket) {
+    ChatInputStream(Socket socket) {
         this.socket = socket;
     }
 
@@ -17,9 +17,12 @@ public class InputStream implements Runnable{
         try (DataInputStream in = new DataInputStream(socket.getInputStream())) {
             while (true) {
                 try {
-                    System.out.println("Новое сообщение > " + in.readUTF());
+                    String line = in.readUTF();
+                    if (line.equals("/end")) {
+                        break;
+                    }
+                    System.out.println("Новое сообщение > " + line);
                 } catch (IOException e) {
-                    e.printStackTrace();
                     break;
                 }
             }

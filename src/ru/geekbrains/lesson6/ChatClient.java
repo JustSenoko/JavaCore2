@@ -7,12 +7,13 @@ public class ChatClient {
     private static final String SERVER_ADDR = "localhost";
     private static final int SERVER_PORT = 7777;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         try (Socket socket = new Socket(SERVER_ADDR, SERVER_PORT)) {
 
-            new Thread(new InputStream(socket)).start();
+            System.out.printf("Подключились к %s%n", SERVER_ADDR);
 
-            OutputStream.enable(socket);
+            StreamsManager streamsManager = new StreamsManager(socket);
+            streamsManager.setInputOutput();
 
         } catch (IOException ex) {
             ex.printStackTrace();
