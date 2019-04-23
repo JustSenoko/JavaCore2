@@ -13,16 +13,11 @@ public class ChatServer {
         try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
             while (true) {
                 System.out.println("Сервер ожидает подключения...");
-                try (Socket socket = serverSocket.accept()) {
+                Socket socket = serverSocket.accept();
 
-                    System.out.println("Подключился " + socket.getInetAddress());
+                System.out.println("Подключился " + socket.getInetAddress());
 
-                    StreamsManager streamsManager = new StreamsManager(socket);
-                    streamsManager.setInputOutput();
-
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
+                new SocketHandler(socket).start();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
