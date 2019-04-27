@@ -113,7 +113,6 @@ public class MainWindow extends JFrame implements MessageReciever {
 
         this.network = new Network(SERVER_ADDR, SERVER_PORT, this);
 
-
         LoginDialog loginDialog = new LoginDialog(this, network);
         loginDialog.setVisible(true);
 

@@ -1,71 +1,118 @@
 package ru.geekbrains.network_chat.message;
 
-import ru.geekbrains.network_chat.authorization.AuthException;
+import ru.geekbrains.network_chat.ChatUser;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class MessagePatterns {
-    public static final String AUTH_PATTERN = "/auth %s %s"; // /auth login password
-    public static final String AUTH_RESULT_PATTERN = "/auth %s"; // /auth login successful
-    public static final String REG_PATTERN = "/reg %s %s %s"; // /reg name login password
-    public static final String MESSAGE_SEND_PATTERN = "/w %s %s %s"; // /w loginTo loginFrom message
-    public static final String MESSAGE_PRINT_PATTERN = "%s %s     %s"; // login message
+
+    private static final String AUTH_PREFIX = "/auth";
+    public static final String AUTH_SEND_PATTERN = AUTH_PREFIX + " %s %s";
+    private static final Pattern AUTH_REC_PATTERN = Pattern.compile(
+            patternConstructor(AUTH_PREFIX, "(\\w+) (\\w+)"));      // /auth login password
+    private static final String AUTH_RESULT_PATTERN = AUTH_PREFIX + " %s";// /auth login successful
+
+    private static final String SUCCESS = "successful";
+    private static final String FAIL = "fails";
+
+    private static final String REG_PREFIX = "/reg";
+    public static final String REG_SEND_PATTERN = REG_PREFIX + " %s %s %s";
+    private static final Pattern REG_REC_PATTERN = Pattern.compile(
+            patternConstructor(REG_PREFIX, "(\\w+) (\\w+) (\\w+)"));  // /reg login password name
+    private static final String REG_RESULT_PATTERN = REG_PREFIX + " %s";
+
+    private static final String CONNECTED = "/connected";
+    public static final String CONNECTED_SEND = CONNECTED + " %s";
+    public static final Pattern CONNECTED_REC = Pattern.compile(patternConstructor(CONNECTED, "(\\w+)"));
+
+    public static final String DISCONNECTED = "/disconnect";
+    public static final String DISCONNECTED_SEND = DISCONNECTED + " %s";
+    public static final Pattern DISCONNECTED_REC = Pattern.compile(patternConstructor(DISCONNECTED, "(\\w+)"));
+
+
+    private static final String MESSAGE_PREFIX = "/w";
+    public static final String MESSAGE_SEND_PATTERN = "/w %s %s %s";
+    private static final Pattern MESSAGE_REC_PATTERN = Pattern.compile(
+            patternConstructor(MESSAGE_PREFIX, "(\\w+) (\\w+) (.+)"),
+            Pattern.MULTILINE);
+
+    //public static final String MESSAGE_PRINT_PATTERN = "%s %s     %s"; // login message
     public static final String UPDATE_USERS_PATTERN = "/updusr";
     public static final String USER_LIST_PATTERN = "/users %s"; // login
     public static final String USER_EXIT_PATTERN = "/exit %s"; // login
 
-    public static Map<String, String> parseAuthMessage(String msg) throws AuthException {
-        Map<String, String> result = new HashMap<>();
-        String[] parts = msg.split(" ");
-        String commandName = AUTH_PATTERN.split(" ")[0];
+    private static final String EX_MESSAGE_PATTERN = "Unknown message pattern: %s%n";
 
-        if (parts.length != 3 || !parts[0].equals(commandName)) {
-            System.out.printf("Incorrect authorization message %s%n", msg);
-            throw new AuthException();
-        }
-        result.put("login", parts[1]);
-        result.put("password", parts[2]);
-
-        return result;
+    private static String patternConstructor(String prefix, String args) {
+        return String.format("^%s%s%s", prefix, (args.equals("") ? "" : " "), args);
     }
 
-    public static Map<String, String> parseSendMessage(String msg) throws SendMessageException {
-        Map<String, String> result = new HashMap<>();
-        String[] parts = msg.split(" ");
-        String commandName = MESSAGE_SEND_PATTERN.split(" ")[0];
-
-        if (parts.length < 4 || !parts[0].equals(commandName)) {
-            System.out.printf("Incorrect message %s%n", msg);
-            throw new SendMessageException();
+    public static ChatUser parseAuthMessage(String msg) {
+        Matcher matcher = AUTH_REC_PATTERN.matcher(msg);
+        if (matcher.matches()) {
+            return new ChatUser(matcher.group(1), matcher.group(2), null);
+        } else {
+            System.out.printf(EX_MESSAGE_PATTERN, msg);
+            return null;
         }
-        result.put("userTo", parts[1]);
-        result.put("userFrom", parts[2]);
-        int length = commandName.length() + parts[1].length() + parts[2].length() + 3;
-        result.put("message", msg.substring(length - 1));
-
-        return result;
-    }
-
-    public static String parseExitMessage(String msg) throws ExitMessageException {
-
-        String[] parts = msg.split(" ");
-        String commandName = USER_EXIT_PATTERN.split(" ")[0];
-
-        if (parts.length < 2 || !parts[0].equals(commandName)) {
-            throw new ExitMessageException();
-        }
-        return parts[1];
     }
 
     public static String authResult(boolean result) {
-        String res = (result ? "successful" : "fails");
+        String res = (result ? SUCCESS : FAIL);
         return String.format(AUTH_RESULT_PATTERN, res);
+    }
+
+    public static ChatUser parseRegMessage(String msg) {
+        Matcher matcher = REG_REC_PATTERN.matcher(msg);
+        if (matcher.matches()) {
+            return new ChatUser(matcher.group(1), matcher.group(2), matcher.group(3));
+        } else {
+            System.out.printf(EX_MESSAGE_PATTERN, msg);
+            return null;
+        }
+    }
+
+    public static String regResult(boolean result) {
+        String res = (result ? SUCCESS : FAIL);
+        return String.format(REG_RESULT_PATTERN, res);
+    }
+
+    public static String parseConnectMessage(String msg) {
+        return StringParameter(CONNECTED_REC, msg);
+    }
+
+    public static String parseDisconnectMessage(String msg) {
+        return StringParameter(DISCONNECTED_REC, msg);
+    }
+
+    public static TextMessage parseSendMessage(String msg) {
+        Matcher matcher = MESSAGE_REC_PATTERN.matcher(msg);
+        if (matcher.matches()) {
+            return new TextMessage(matcher.group(1), matcher.group(2), matcher.group(3));
+        } else {
+            System.out.println("Unknown message pattern: " + msg);
+            return null;
+        }
     }
 
     public static boolean isUserListPattern(String msg) {
         String commandName = USER_LIST_PATTERN.split(" ")[0];
         String[] parts = msg.split(" ");
         return parts[0].equals(commandName);
+    }
+
+    public static boolean isEndMessage(String msg) {
+        return msg.equalsIgnoreCase("/end");
+    }
+
+    public static String StringParameter(Pattern pattern, String msg) {
+        Matcher matcher = MESSAGE_REC_PATTERN.matcher(msg);
+        if (matcher.matches()) {
+            return matcher.group(1);
+        } else {
+            System.out.printf(EX_MESSAGE_PATTERN, msg);
+            return null;
+        }
     }
 }

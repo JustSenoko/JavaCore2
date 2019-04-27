@@ -3,29 +3,43 @@ package ru.geekbrains.network_chat.authorization;
 import ru.geekbrains.network_chat.ChatUser;
 import ru.geekbrains.network_chat.message.MessagePatterns;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class AuthorizationServiceImpl implements AuthorizationService {
 
-    public Map<String, String> users = new HashMap<>();
+    private Map<String, ChatUser> users = Collections.synchronizedMap(new HashMap<>());
 
     public AuthorizationServiceImpl() {
-        users.put("ivan", "123");
-        users.put("petr", "345");
-        users.put("julia", "789");
+        users.put("ivan", new ChatUser("ivan", "123", "Иван"));
+        users.put("petr", new ChatUser("petr", "345", "Петр"));
+        users.put("julia", new ChatUser("", "789", "Юлия"));
     }
 
     @Override
     public boolean authUser(ChatUser user) {
-        String pwd = users.get(user.getLogin());
+        String pwd = users.get(user.getLogin()).getPassword();
         return pwd != null && pwd.equals(user.getPassword());
     }
 
     @Override
-    public ChatUser checkAuthentication(String authMessage) throws AuthException {
-        Map<String, String> auth = MessagePatterns.parseAuthMessage(authMessage);
-        return new ChatUser(auth.get("login"), auth.get("password"), auth.get("name"));
+    public ChatUser checkAuthorization(String authMessage) {
+        return MessagePatterns.parseAuthMessage(authMessage);
+    }
+
+    @Override
+    public ChatUser checkRegistration(String regMessage) {
+        return MessagePatterns.parseRegMessage(regMessage);
+    }
+
+    @Override
+    public boolean addUser(ChatUser user) {
+        if (users.containsKey(user.getLogin())) {
+            return false;
+        }
+        users.put(user.getLogin(), user);
+        return true;
     }
 
 

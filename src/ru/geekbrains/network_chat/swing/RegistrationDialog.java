@@ -1,12 +1,12 @@
 package ru.geekbrains.network_chat.swing;
 
-        import ru.geekbrains.network_chat.Network;
-        import ru.geekbrains.network_chat.authorization.AuthException;
+import ru.geekbrains.network_chat.Network;
+import ru.geekbrains.network_chat.authorization.AuthException;
 
-        import javax.swing.*;
-        import javax.swing.border.LineBorder;
-        import java.awt.*;
-        import java.io.IOException;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.io.IOException;
 
 public class RegistrationDialog extends JDialog {
 
@@ -79,8 +79,8 @@ public class RegistrationDialog extends JDialog {
         bp.add(btnRegistration);
         btnRegistration.addActionListener(e -> {
             try {
-                network.addUser(tfUsername.getText(), tfLogin.getText(), String.valueOf(pfPassword.getPassword()));
-                registered = true;
+                network.addUser(tfLogin.getText(), String.valueOf(pfPassword.getPassword()), tfUsername.getText());
+                //registered = true;
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(RegistrationDialog.this,
                         "Ошибка сети",
@@ -89,7 +89,7 @@ public class RegistrationDialog extends JDialog {
                 return;
             } catch (AuthException ex) {
                 JOptionPane.showMessageDialog(RegistrationDialog.this,
-                        "Ошибка регистрации",
+                        "Ошибка регистрации" + ex.getMessage(),
                         "Регистрация",
                         JOptionPane.ERROR_MESSAGE);
                 return;
@@ -120,6 +120,14 @@ public class RegistrationDialog extends JDialog {
 
     public boolean isRegistered() {
         return registered;
+    }
+
+    public String getLogin() {
+        return tfLogin.getText();
+    }
+
+    public String getPassword() {
+        return String.valueOf(pfPassword.getPassword());
     }
 }
 

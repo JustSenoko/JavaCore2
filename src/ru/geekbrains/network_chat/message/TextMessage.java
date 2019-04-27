@@ -3,7 +3,6 @@ package ru.geekbrains.network_chat.message;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static ru.geekbrains.network_chat.message.MessagePatterns.MESSAGE_PRINT_PATTERN;
 
 public class TextMessage {
     private String userFrom;
@@ -35,7 +34,7 @@ public class TextMessage {
         return date.format(DateTimeFormatter.ofPattern(formatPattern));
     }
 
-    public String toString() {
-        return String.format(MESSAGE_PRINT_PATTERN, userFrom, message, getDateFormatted());
-    }
+//    public String toString() {
+//        return String.format(MESSAGE_PRINT_PATTERN, userFrom, message, getDateFormatted());
+//    }
 }

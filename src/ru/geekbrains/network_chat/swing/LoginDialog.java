@@ -61,32 +61,17 @@ class LoginDialog extends JDialog {
         JPanel bp = new JPanel();
         bp.add(btnLogin);
 
-        btnLogin.addActionListener(e -> {
-            try {
-                network.authorize(tfUsername.getText(), String.valueOf(pfPassword.getPassword()));
-                connected = true;
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(LoginDialog.this,
-                        "Ошибка сети",
-                        "Авторизация",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            } catch (AuthException ex) {
-                JOptionPane.showMessageDialog(LoginDialog.this,
-                        "Ошибка авторизации",
-                        "Авторизация",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            dispose();
-        });
+        btnLogin.addActionListener(e -> authorise());
 
-//          TODO reg
-//        bp.add(btnRegistration);
-//        btnRegistration.addActionListener(e -> {
-//            RegistrationDialog registrationDialog = new RegistrationDialog(this, network);
-//            registrationDialog.setVisible(true);
-//        });
+        bp.add(btnRegistration);
+        btnRegistration.addActionListener(e -> {
+            RegistrationDialog registrationDialog = new RegistrationDialog(this, network);
+            registrationDialog.setVisible(true);
+            if (registrationDialog.isRegistered()) {
+                tfUsername.setText(registrationDialog.getLogin());
+                pfPassword.setText(registrationDialog.getPassword());
+            }
+        });
 
         bp.add(btnCancel);
         btnCancel.addActionListener(e -> {
@@ -100,6 +85,26 @@ class LoginDialog extends JDialog {
         pack();
         setResizable(false);
         setLocationRelativeTo(parent);
+    }
+
+    void authorise() {
+        try {
+            network.authorize(tfUsername.getText(), String.valueOf(pfPassword.getPassword()));
+            connected = true;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(LoginDialog.this,
+                    "Ошибка сети",
+                    "Авторизация",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        } catch (AuthException ex) {
+            JOptionPane.showMessageDialog(LoginDialog.this,
+                    "Ошибка авторизации",
+                    "Авторизация",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        dispose();
     }
 
     boolean isConnected() {

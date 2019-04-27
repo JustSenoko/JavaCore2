@@ -1,16 +1,14 @@
 package ru.geekbrains.network_chat;
 
-import ru.geekbrains.network_chat.message.ExitMessageException;
 import ru.geekbrains.network_chat.message.MessagePatterns;
-import ru.geekbrains.network_chat.message.SendMessageException;
+import ru.geekbrains.network_chat.message.TextMessage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Map;
+import java.sql.SQLOutput;
 
-import static ru.geekbrains.network_chat.message.MessagePatterns.MESSAGE_SEND_PATTERN;
 import static ru.geekbrains.network_chat.message.MessagePatterns.UPDATE_USERS_PATTERN;
 
 class ClientHandler {
@@ -36,44 +34,35 @@ class ClientHandler {
             try (DataInputStream in = new DataInputStream(socket.getInputStream())) {
                 while (true) {
                     String msg = in.readUTF();
-                    if (isEndMessage(msg)) {
+
+                    // если это сообщение от одного пользователя другому
+                    TextMessage textMessage = MessagePatterns.parseSendMessage(msg);
+                    if (textMessage != null) {
+                        chatServer.sendTextMessage(textMessage);
+                        continue;
+                    }
+
+                    // если это запрос на обновление списка пользователей
+                    if (msg.equals(UPDATE_USERS_PATTERN)) {
+                        chatServer.sendUpdUserListMessage();
+                        continue;
+                    }
+
+                    String disconnect = MessagePatterns.parseDisconnectMessage(msg);
+                    if (disconnect != null) {
+                        chatServer.userExit(MessagePatterns.parseDisconnectMessage(msg));
                         break;
                     }
-                    try {
-                        // если это сообщение от одного пользователя другому
-                        Map<String, String> msgMap = MessagePatterns.parseSendMessage(msg);
-                        String message = msgMap.get("message");
-                        chatServer.sendMessage(msgMap.get("userTo"), msgMap.get("userFrom"), message);
 
-                    } catch (SendMessageException e) {
-                        // если это запрос на обновление списка пользователей
-                        if (msg.equals(UPDATE_USERS_PATTERN)) {
-                            chatServer.sendUpdUserListMessage();
-                        } else {
-                            try {
-                                chatServer.userExit(MessagePatterns.parseExitMessage(msg));
-                            } catch (ExitMessageException ex) {
-                                System.out.printf("Incorrect message %s%n", msg);
-                            }
-                        }
-                    }
+                    System.out.printf(MessagePatterns.USER_EXIT_PATTERN, msg);
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-
         out = new DataOutputStream(socket.getOutputStream());
         receiveThread.start();
-    }
-
-    private boolean isEndMessage(String msg) {
-        return msg.equalsIgnoreCase("/end");
-    }
-
-    void sendMessage(String userFrom, String msg) throws IOException {
-        out.writeUTF(String.format(MESSAGE_SEND_PATTERN, user, userFrom, msg));
-        System.out.printf(MESSAGE_SEND_PATTERN, user, userFrom, msg);
     }
 
     void sendMessage(String msg) throws IOException {
