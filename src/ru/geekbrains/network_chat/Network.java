@@ -2,15 +2,13 @@ package ru.geekbrains.network_chat;
 
 import ru.geekbrains.network_chat.authorization.AuthException;
 import ru.geekbrains.network_chat.message.MessagePatterns;
-import ru.geekbrains.network_chat.message.MessageReciever;
-import ru.geekbrains.network_chat.message.ParseMessageException;
+import ru.geekbrains.network_chat.message.MessageReceiver;
 import ru.geekbrains.network_chat.message.TextMessage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Map;
 
 import static ru.geekbrains.network_chat.message.MessagePatterns.*;
 
@@ -22,16 +20,16 @@ public class Network {
 
     private String hostName;
     private int port;
-    private MessageReciever messageReciever;
+    private MessageReceiver messageReceiver;
 
     private String login;
 
     private Thread receiverThread;
 
-    public Network(String hostName, int port, MessageReciever messageReciever) {
+    public Network(String hostName, int port, MessageReceiver messageReceiver) {
         this.hostName = hostName;
         this.port = port;
-        this.messageReciever = messageReciever;
+        this.messageReceiver = messageReceiver;
 
         this.receiverThread = new Thread(() -> {
             while (true) {
@@ -39,11 +37,11 @@ public class Network {
                     String text = in.readUTF();
                     TextMessage textMessage = MessagePatterns.parseSendMessage(text);
                     if (textMessage != null) {
-                        messageReciever.submitMessage(textMessage);
+                        messageReceiver.submitMessage(textMessage);
                         continue;
                     }
                     if (MessagePatterns.isUserListPattern(text)) {
-                        messageReciever.updateUserList(text);
+                        messageReceiver.updateUserList(text);
                     }
 
                 } catch (IOException e) {
@@ -94,7 +92,7 @@ public class Network {
         sendMessage(String.format(MESSAGE_SEND_PATTERN, message.getUserTo(), login, message.getMessage()));
     }
 
-    public void sendMessage(String msg) {
+    private void sendMessage(String msg) {
         try {
             out.writeUTF(msg);
             out.flush();

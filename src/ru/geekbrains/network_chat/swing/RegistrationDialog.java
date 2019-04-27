@@ -118,15 +118,15 @@ public class RegistrationDialog extends JDialog {
         panel.add(component, cs);
     }
 
-    public boolean isRegistered() {
+    boolean isRegistered() {
         return registered;
     }
 
-    public String getLogin() {
+    String getLogin() {
         return tfLogin.getText();
     }
 
-    public String getPassword() {
+    String getPassword() {
         return String.valueOf(pfPassword.getPassword());
     }
 }

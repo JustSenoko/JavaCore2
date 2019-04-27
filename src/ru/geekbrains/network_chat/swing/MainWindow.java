@@ -1,7 +1,7 @@
 package ru.geekbrains.network_chat.swing;
 
 import ru.geekbrains.network_chat.Network;
-import ru.geekbrains.network_chat.message.MessageReciever;
+import ru.geekbrains.network_chat.message.MessageReceiver;
 import ru.geekbrains.network_chat.message.TextMessage;
 
 import javax.swing.*;
@@ -9,9 +9,7 @@ import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import static ru.geekbrains.network_chat.message.MessagePatterns.USER_EXIT_PATTERN;
-
-public class MainWindow extends JFrame implements MessageReciever {
+public class MainWindow extends JFrame implements MessageReceiver {
 
     private static final String SERVER_ADDR = "localhost";
     private static final int SERVER_PORT = 7777;

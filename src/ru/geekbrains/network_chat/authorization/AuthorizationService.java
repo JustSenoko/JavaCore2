@@ -1,8 +1,6 @@
 package ru.geekbrains.network_chat.authorization;
 
-import ru.geekbrains.lesson4.Chat;
 import ru.geekbrains.network_chat.ChatUser;
-import ru.geekbrains.network_chat.message.AuthorizationMessage;
 
 public interface AuthorizationService {
 

@@ -1,6 +1,6 @@
 package ru.geekbrains.network_chat.message;
 
-public interface MessageReciever {
+public interface MessageReceiver {
 
     void submitMessage(TextMessage message);
 

@@ -7,7 +7,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.sql.SQLOutput;
 
 import static ru.geekbrains.network_chat.message.MessagePatterns.UPDATE_USERS_PATTERN;
 

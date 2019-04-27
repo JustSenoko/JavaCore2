@@ -1,6 +1,5 @@
 package ru.geekbrains.network_chat.swing;
 
-import ru.geekbrains.lesson4.ChatRecord;
 import ru.geekbrains.network_chat.message.TextMessage;
 
 import javax.swing.*;

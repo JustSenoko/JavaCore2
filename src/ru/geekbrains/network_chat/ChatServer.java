@@ -79,7 +79,7 @@ public class ChatServer {
         }
     }
 
-    boolean registerNewUser(String regMessage) {
+    private boolean registerNewUser(String regMessage) {
         ChatUser user = authService.checkRegistration(regMessage);
         if (user != null) {
             return authService.addUser(user);
@@ -87,7 +87,7 @@ public class ChatServer {
         return false;
     }
 
-    void sendMessage(String userTo, String userFrom, String msg) {
+    private void sendMessage(String userTo, String userFrom, String msg) {
 
         if (!userIsOnline(userTo)) {
             msg = String.format("Не удалось отправить сообщение. Пользователь %s не в сети.%n", userTo);
@@ -129,7 +129,7 @@ public class ChatServer {
         sendUpdUserListMessage();
     }
 
-    public void sendTextMessage(TextMessage textMessage) {
+    void sendTextMessage(TextMessage textMessage) {
         sendMessage(textMessage.getUserTo(), textMessage.getUserFrom(), textMessage.getMessage());
     }
 }

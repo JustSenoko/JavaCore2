@@ -106,7 +106,7 @@ public final class MessagePatterns {
         return msg.equalsIgnoreCase("/end");
     }
 
-    public static String StringParameter(Pattern pattern, String msg) {
+    private static String StringParameter(Pattern pattern, String msg) {
         Matcher matcher = MESSAGE_REC_PATTERN.matcher(msg);
         if (matcher.matches()) {
             return matcher.group(1);

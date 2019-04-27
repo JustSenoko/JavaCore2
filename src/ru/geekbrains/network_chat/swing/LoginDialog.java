@@ -87,7 +87,7 @@ class LoginDialog extends JDialog {
         setLocationRelativeTo(parent);
     }
 
-    void authorise() {
+    private void authorise() {
         try {
             network.authorize(tfUsername.getText(), String.valueOf(pfPassword.getPassword()));
             connected = true;
