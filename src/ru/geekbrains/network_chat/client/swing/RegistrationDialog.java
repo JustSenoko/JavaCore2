@@ -1,6 +1,6 @@
-package ru.geekbrains.network_chat.swing;
+package ru.geekbrains.network_chat.client.swing;
 
-import ru.geekbrains.network_chat.Network;
+import ru.geekbrains.network_chat.client.Network;
 import ru.geekbrains.network_chat.authorization.AuthException;
 
 import javax.swing.*;

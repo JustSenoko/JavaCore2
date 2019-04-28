@@ -1,6 +1,5 @@
 package ru.geekbrains.network_chat.authorization;
 
-import ru.geekbrains.network_chat.ChatUser;
 import ru.geekbrains.network_chat.message.MessagePatterns;
 
 import java.util.Collections;
@@ -39,6 +38,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
             return false;
         }
         users.put(user.getLogin(), user);
+        System.out.printf("User %s registered successful!%n", user.getLogin());
         return true;
     }
 

@@ -1,6 +1,6 @@
-package ru.geekbrains.network_chat;
+package ru.geekbrains.network_chat.client;
 
-import ru.geekbrains.network_chat.swing.MainWindow;
+import ru.geekbrains.network_chat.client.swing.MainWindow;
 
 import javax.swing.*;
 

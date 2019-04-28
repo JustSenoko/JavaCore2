@@ -1,6 +1,6 @@
-package ru.geekbrains.network_chat.swing;
+package ru.geekbrains.network_chat.client.swing;
 
-import ru.geekbrains.network_chat.Network;
+import ru.geekbrains.network_chat.client.Network;
 import ru.geekbrains.network_chat.authorization.AuthException;
 
 import javax.swing.*;
@@ -52,32 +52,34 @@ class LoginDialog extends JDialog {
         cs.gridy = 1;
         cs.gridwidth = 2;
         panel.add(pfPassword, cs);
+        pfPassword.addActionListener(e -> authorise());
+
         panel.setBorder(new LineBorder(Color.GRAY));
 
         btnLogin = new JButton("Войти");
-        btnRegistration = new JButton("Регистрация");
-        btnCancel = new JButton("Отмена");
-
-        JPanel bp = new JPanel();
-        bp.add(btnLogin);
-
         btnLogin.addActionListener(e -> authorise());
 
-        bp.add(btnRegistration);
+        btnRegistration = new JButton("Регистрация");
         btnRegistration.addActionListener(e -> {
             RegistrationDialog registrationDialog = new RegistrationDialog(this, network);
             registrationDialog.setVisible(true);
-            if (registrationDialog.isRegistered()) {
-                tfUsername.setText(registrationDialog.getLogin());
-                pfPassword.setText(registrationDialog.getPassword());
-            }
+//            if (registrationDialog.isRegistered()) {
+//                tfUsername.setText(registrationDialog.getLogin());
+//                pfPassword.setText(registrationDialog.getPassword());
+//                authorise();
+//            }
         });
 
-        bp.add(btnCancel);
+        btnCancel = new JButton("Отмена");
         btnCancel.addActionListener(e -> {
             connected = false;
             dispose();
         });
+
+        JPanel bp = new JPanel();
+        bp.add(btnLogin);
+        bp.add(btnRegistration);
+        bp.add(btnCancel);
 
         getContentPane().add(panel, BorderLayout.CENTER);
         getContentPane().add(bp, BorderLayout.PAGE_END);

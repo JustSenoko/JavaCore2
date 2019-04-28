@@ -1,4 +1,4 @@
-package ru.geekbrains.network_chat.swing;
+package ru.geekbrains.network_chat.client.swing;
 
 import ru.geekbrains.network_chat.message.TextMessage;
 
