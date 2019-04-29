@@ -10,8 +10,11 @@ class TextMessageCellRenderer extends JPanel implements ListCellRenderer<TextMes
     private final JLabel msgUser;
     private final JTextArea msgText;
     private final JLabel msgData;
+    private final String login; //текущий пользователь
 
-    TextMessageCellRenderer() {
+    TextMessageCellRenderer(String login) {
+
+        this.login = login;
 
         setLayout(new BorderLayout());
         setEnabled(false);
@@ -20,7 +23,7 @@ class TextMessageCellRenderer extends JPanel implements ListCellRenderer<TextMes
         Font f = msgUser.getFont();
         msgUser.setFont(f.deriveFont(f.getStyle() | Font.BOLD));
 
-        add(msgUser, BorderLayout.WEST);
+        add(msgUser, BorderLayout.CENTER);
 
         msgData = new JLabel();
 
@@ -29,6 +32,7 @@ class TextMessageCellRenderer extends JPanel implements ListCellRenderer<TextMes
         msgText = new JTextArea();
         msgText.setLineWrap(true);
         msgText.setWrapStyleWord(true);
+        msgText.setPreferredSize(new Dimension(0, 15));
 
         add(msgText, BorderLayout.SOUTH);
     }
@@ -39,9 +43,22 @@ class TextMessageCellRenderer extends JPanel implements ListCellRenderer<TextMes
                                                   boolean isSelected, boolean cellHasFocus) {
         setBackground(list.getBackground());
         msgData.setText(textMessage.getDateFormatted());
-        msgUser.setOpaque(true);
-        msgUser.setText(textMessage.getUserFrom());
         msgText.setText(textMessage.getMessage());
+        msgUser.setOpaque(true);
+
+        String userFrom = textMessage.getUserFrom();
+        if (isOutcomingMessage(userFrom)) {
+            msgUser.setText("Вы");
+        } else {
+            msgUser.setText(userFrom);
+            msgUser.setHorizontalAlignment(SwingConstants.LEFT);
+//            msgUser.setBackground(Color.LIGHT_GRAY);
+//            msgText.setBackground(Color.LIGHT_GRAY);
+        }
         return this;
+    }
+
+    private boolean isOutcomingMessage(String userFrom) {
+        return userFrom.equals(login);
     }
 }

@@ -97,7 +97,7 @@ public class Network implements Closeable {
         sendMessage(DISCONNECTED);
     }
 
-    void parseMessage(String msg) {
+    private void parseMessage(String msg) {
         String msgCommand = msg.split(" ")[0];
         String userLogin;
 

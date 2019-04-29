@@ -2,13 +2,15 @@ package ru.geekbrains.network_chat.client.swing;
 
 import ru.geekbrains.network_chat.client.Network;
 import ru.geekbrains.network_chat.client.MessageReceiver;
+import ru.geekbrains.network_chat.client.UnreadMessage;
 import ru.geekbrains.network_chat.message.TextMessage;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class MainWindow extends JFrame implements MessageReceiver {
@@ -17,14 +19,15 @@ public class MainWindow extends JFrame implements MessageReceiver {
     private static final int SERVER_PORT = 7777;
 
     private final JList<TextMessage> msgList;
-    private final DefaultListModel<TextMessage> msgListModel;
+    private Map<String, DefaultListModel<TextMessage>> userMsgModelMap = new HashMap<>();
+    private Map<String, UnreadMessage> userUnreadMsgMap = new HashMap<>();
+
     private final JTextField messageField;
-    //private final JTextField tfUserTo;
-    //private final JComboBox<String> cbUsers;
-    private final JList<String> userList;
-    private final DefaultListModel<String> userListModel;
+    private final JList<UnreadMessage> userList;
+    private final DefaultListModel<UnreadMessage> userListModel;
 
     private Network network;
+    private String userTo = "";
 
     public MainWindow() {
 
@@ -46,8 +49,11 @@ public class MainWindow extends JFrame implements MessageReceiver {
         userList = new JList<>();
         userListModel = new DefaultListModel<>();
         userList.setModel(userListModel);
-        userList.setPreferredSize(new Dimension(100, 0));
-        add(userList, BorderLayout.WEST);
+        userList.setPreferredSize(new Dimension(50, 0));
+        userList.setMaximumSize(new Dimension(50, 0));
+        UserListCellRenderer userListCellRenderer = new UserListCellRenderer();
+        userList.setCellRenderer(userListCellRenderer);
+        userList.addListSelectionListener(e -> setUserTo());
 
         JScrollPane scrollUsers = new JScrollPane(userList,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -55,11 +61,6 @@ public class MainWindow extends JFrame implements MessageReceiver {
         add(scrollUsers, BorderLayout.WEST);
 
         msgList = new JList<>();
-        msgListModel = new DefaultListModel<>();
-        msgList.setModel(msgListModel);
-
-        TextMessageCellRenderer msgListCellRenderer = new TextMessageCellRenderer();
-        msgList.setCellRenderer(msgListCellRenderer);
 
         JScrollPane scrollMessages = new JScrollPane(msgList,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
@@ -74,6 +75,7 @@ public class MainWindow extends JFrame implements MessageReceiver {
         sendMessagePanel.add(messageField, BorderLayout.CENTER);
 
         JButton sendButton = new JButton("Отправить");
+        sendButton.isDefaultButton();
         sendButton.addActionListener(e -> sendMessage());
         sendMessagePanel.add(sendButton, BorderLayout.EAST);
 
@@ -89,25 +91,39 @@ public class MainWindow extends JFrame implements MessageReceiver {
         if (!loginDialog.isConnected()) {
             System.exit(0);
         }
-
         setTitle(String.format("Чат (%s)", network.getLogin()));
+        TextMessageCellRenderer msgListCellRenderer = new TextMessageCellRenderer(network.getLogin());
+        msgList.setCellRenderer(msgListCellRenderer);
+    }
 
+    private void setUserTo() {
+
+        if (userList.getSelectedValue() == null) {
+            return;
+        }
+
+        userTo = userList.getSelectedValue().getLogin();
+        if (userTo == null && userListModel.size() > 0) {
+            userTo = userListModel.elementAt(0).getLogin();
+        }
+        if (userTo != null) {
+            if (userMsgModelMap.containsKey(userTo)) {
+                msgList.setModel(userMsgModelMap.get(userTo));
+            }
+            if (userUnreadMsgMap.containsKey(userTo)) {
+                userUnreadMsgMap.get(userTo).resetUnreadCount();
+            }
+        }
     }
 
     private void sendMessage() {
         String msg = messageField.getText();
-        if (msg == null || msg.trim().isEmpty()) {
-            return;
-        }
-
-//        String userTo = tfUserTo.getText();
-        String userTo = userList.getSelectedValue();
-//        String userTo = cbUsers.getSelectedItem().toString();
-        if (userTo == null || msg.trim().isEmpty()) {
+        if (msg == null || msg.trim().isEmpty() || userTo.isEmpty()) {
             return;
         }
 
         TextMessage textMessage = new TextMessage(userTo, network.getLogin(), msg);
+        DefaultListModel<TextMessage> msgListModel = userMsgModelMap.get(userTo);
         msgListModel.add(msgListModel.size(), textMessage);
         messageField.setText("");
         network.sendTextMessage(textMessage);
@@ -116,8 +132,13 @@ public class MainWindow extends JFrame implements MessageReceiver {
     @Override
     public void submitMessage(TextMessage message) {
         SwingUtilities.invokeLater(() -> {
+            DefaultListModel<TextMessage> msgListModel = userMsgModelMap.get(message.getUserFrom());
             msgListModel.add(msgListModel.size(), message);
-            msgList.ensureIndexIsVisible(msgListModel.size() - 1);
+            if (userTo.equals(message.getUserFrom())) {
+                msgList.ensureIndexIsVisible(msgListModel.size() - 1);
+            } else {
+                userUnreadMsgMap.get(message.getUserFrom()).incUnreadCount();
+            }
         });
     }
 
@@ -127,41 +148,53 @@ public class MainWindow extends JFrame implements MessageReceiver {
         String login = network.getLogin();
         SwingUtilities.invokeLater(() -> {
             userListModel.removeAllElements();
-            Iterator iterator = userSet.iterator();
-            while (iterator.hasNext()) {
-                String user = (String) iterator.next();
-                if (user.equals(login)) {
+            for (String userLogin : userSet) {
+                if (userLogin.equals(login)) {
                     continue;
                 }
-                userListModel.addElement(user);
+                addUser(userLogin);
             }
             updateUserListView();
         });
     }
 
+    private void addUser(String login) {
+        UnreadMessage newUser = new UnreadMessage(login);
+        userListModel.addElement(newUser);
+        userMsgModelMap.putIfAbsent(login, new DefaultListModel<>());
+        userUnreadMsgMap.putIfAbsent(login, newUser);
+    }
+
     private void updateUserListView() {
-        if (userListModel.size() == 1) {
+        if (userListModel.size() == 1
+                || (userListModel.size() > 1 && userList.getSelectedValue() == null)) {
             userList.setSelectedIndex(0);
         }
+        setUserTo();
     }
 
     @Override
     public void userConnected(String login) {
         SwingUtilities.invokeLater(() -> {
-            int ix = userListModel.indexOf(login);
+            int ix = userListModel.indexOf(userUnreadMsgMap.get(login));
             if (ix == -1) {
-                userListModel.add(userListModel.size(), login);
+                addUser(login);
             }
+            updateUserListView();
         });
     }
 
     @Override
     public void userDisconnected(String login) {
         SwingUtilities.invokeLater(() -> {
-            int ix = userListModel.indexOf(login);
+            int ix = userListModel.indexOf(userUnreadMsgMap.get(login));
             if (ix >= 0) {
                 userListModel.remove(ix);
+                //из модели ссобщений не удаляем - если он переподключится, сохранится история
             }
+            updateUserListView();
         });
     }
+
+
 }

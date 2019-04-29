@@ -8,7 +8,7 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.io.IOException;
 
-public class RegistrationDialog extends JDialog {
+class RegistrationDialog extends JDialog {
 
     private Network network;
     private JTextField tfUsername;
@@ -25,9 +25,7 @@ public class RegistrationDialog extends JDialog {
     private JPanel panel;
     private GridBagConstraints cs;
 
-    private boolean registered;
-
-    public RegistrationDialog(JDialog parent, Network network) {
+    RegistrationDialog(JDialog parent, Network network) {
         super(parent, "Логин", true);
         this.network = network;
 
@@ -72,15 +70,23 @@ public class RegistrationDialog extends JDialog {
         panel.setBorder(new LineBorder(Color.GRAY));
 
         btnRegistration = new JButton("Регистрация");
+        btnRegistration.isDefaultButton();
         btnCancel = new JButton("Отмена");
 
         JPanel bp = new JPanel();
 
         bp.add(btnRegistration);
         btnRegistration.addActionListener(e -> {
+            if (!String.valueOf(pfPassword.getPassword()).equals(String.valueOf(pfPasswordRepeat.getPassword()))) {
+                JOptionPane.showMessageDialog(RegistrationDialog.this,
+                        "Введенные пароли не совпадают",
+                        "Регистрация",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             try {
                 network.addUser(tfLogin.getText(), String.valueOf(pfPassword.getPassword()), tfUsername.getText());
-                //registered = true;
+
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(RegistrationDialog.this,
                         "Ошибка сети",
@@ -98,10 +104,7 @@ public class RegistrationDialog extends JDialog {
         });
 
         bp.add(btnCancel);
-        btnCancel.addActionListener(e -> {
-            registered = false;
-            dispose();
-        });
+        btnCancel.addActionListener(e -> dispose());
 
         getContentPane().add(panel, BorderLayout.CENTER);
         getContentPane().add(bp, BorderLayout.PAGE_END);
@@ -118,16 +121,9 @@ public class RegistrationDialog extends JDialog {
         panel.add(component, cs);
     }
 
-    boolean isRegistered() {
-        return registered;
-    }
-
     String getLogin() {
         return tfLogin.getText();
     }
 
-    String getPassword() {
-        return String.valueOf(pfPassword.getPassword());
-    }
 }
 

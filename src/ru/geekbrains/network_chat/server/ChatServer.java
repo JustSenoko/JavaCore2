@@ -60,7 +60,7 @@ public class ChatServer {
                     continue;
                 }
 
-                if (authService.authUser(user)) {
+                if (authService.authUser(user) && !userIsOnline(user.getLogin())) {
                     System.out.printf("User %s authorized successful!%n", user.getLogin());
                     out.writeUTF(MessagePatterns.authResult(true));
                     out.flush();
@@ -102,7 +102,6 @@ public class ChatServer {
         ClientHandler userToClientHandler = clientHandlerMap.get(userTo);
         try {
             userToClientHandler.sendMessage(msg);
-//            System.out.println(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -124,12 +123,7 @@ public class ChatServer {
     }
 
     private void subscribe(String login, Socket socket) throws IOException {
-        // TODO Проверить, подключен ли уже пользователь. Если да, то отправить клиенту ошибку
-        if (userIsOnline(login)) {
-            String msg = String.format("User %s is already connected", login);
-            sendMessage(login, msg);
-            return;
-        }
+
         clientHandlerMap.put(login, new ClientHandler(login, socket, this));
         String msg = String.format(MessagePatterns.CONNECTED_SEND, login);
         sendToAllUsersExceptLogin(login, msg);
@@ -139,7 +133,7 @@ public class ChatServer {
 
     void unsubscribe(String login) {
         clientHandlerMap.remove(login);
-        // TODO Отправить всем подключенным пользователям сообщение, что данный пользователь отключился
+
         String msg = String.format(MessagePatterns.DISCONNECTED_SEND, login);
         sendToAllUsersExceptLogin(login, msg);
     }

@@ -57,17 +57,13 @@ class LoginDialog extends JDialog {
         panel.setBorder(new LineBorder(Color.GRAY));
 
         btnLogin = new JButton("Войти");
+        btnLogin.isDefaultButton();
         btnLogin.addActionListener(e -> authorise());
 
         btnRegistration = new JButton("Регистрация");
         btnRegistration.addActionListener(e -> {
             RegistrationDialog registrationDialog = new RegistrationDialog(this, network);
             registrationDialog.setVisible(true);
-//            if (registrationDialog.isRegistered()) {
-//                tfUsername.setText(registrationDialog.getLogin());
-//                pfPassword.setText(registrationDialog.getPassword());
-//                authorise();
-//            }
         });
 
         btnCancel = new JButton("Отмена");
