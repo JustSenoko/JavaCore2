@@ -66,6 +66,7 @@ class RegistrationDialog extends JDialog {
 
         pfPasswordRepeat = new JPasswordField(20);
         addComponent(pfPasswordRepeat, 1, row, 2);
+        pfPasswordRepeat.addActionListener(e -> registerNewUser());
 
         panel.setBorder(new LineBorder(Color.GRAY));
 
@@ -76,32 +77,7 @@ class RegistrationDialog extends JDialog {
         JPanel bp = new JPanel();
 
         bp.add(btnRegistration);
-        btnRegistration.addActionListener(e -> {
-            if (!String.valueOf(pfPassword.getPassword()).equals(String.valueOf(pfPasswordRepeat.getPassword()))) {
-                JOptionPane.showMessageDialog(RegistrationDialog.this,
-                        "Введенные пароли не совпадают",
-                        "Регистрация",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            try {
-                network.addUser(tfLogin.getText(), String.valueOf(pfPassword.getPassword()), tfUsername.getText());
-
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(RegistrationDialog.this,
-                        "Ошибка сети",
-                        "Регистрация",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            } catch (AuthException ex) {
-                JOptionPane.showMessageDialog(RegistrationDialog.this,
-                        "Ошибка регистрации" + ex.getMessage(),
-                        "Регистрация",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            dispose();
-        });
+        btnRegistration.addActionListener(e -> registerNewUser());
 
         bp.add(btnCancel);
         btnCancel.addActionListener(e -> dispose());
@@ -123,6 +99,33 @@ class RegistrationDialog extends JDialog {
 
     String getLogin() {
         return tfLogin.getText();
+    }
+
+    private void registerNewUser() {
+        if (!String.valueOf(pfPassword.getPassword()).equals(String.valueOf(pfPasswordRepeat.getPassword()))) {
+            JOptionPane.showMessageDialog(RegistrationDialog.this,
+                    "Введенные пароли не совпадают",
+                    "Регистрация",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            network.addUser(tfLogin.getText(), String.valueOf(pfPassword.getPassword()), tfUsername.getText());
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(RegistrationDialog.this,
+                    "Ошибка сети",
+                    "Регистрация",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        } catch (AuthException ex) {
+            JOptionPane.showMessageDialog(RegistrationDialog.this,
+                    "Ошибка регистрации" + ex.getMessage(),
+                    "Регистрация",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        dispose();
     }
 
 }
