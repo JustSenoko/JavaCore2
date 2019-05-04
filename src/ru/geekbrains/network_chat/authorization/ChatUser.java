@@ -1,4 +1,4 @@
-package ru.geekbrains.network_chat;
+package ru.geekbrains.network_chat.authorization;
 
 public class ChatUser {
     private String login;

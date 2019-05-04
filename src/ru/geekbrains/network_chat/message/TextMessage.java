@@ -33,8 +33,4 @@ public class TextMessage {
         String formatPattern = "HH:mm";
         return date.format(DateTimeFormatter.ofPattern(formatPattern));
     }
-
-//    public String toString() {
-//        return String.format(MESSAGE_PRINT_PATTERN, userFrom, message, getDateFormatted());
-//    }
 }

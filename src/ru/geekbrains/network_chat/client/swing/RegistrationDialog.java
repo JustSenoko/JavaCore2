@@ -1,6 +1,6 @@
-package ru.geekbrains.network_chat.swing;
+package ru.geekbrains.network_chat.client.swing;
 
-import ru.geekbrains.network_chat.Network;
+import ru.geekbrains.network_chat.client.Network;
 import ru.geekbrains.network_chat.authorization.AuthException;
 
 import javax.swing.*;
@@ -8,7 +8,7 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.io.IOException;
 
-public class RegistrationDialog extends JDialog {
+class RegistrationDialog extends JDialog {
 
     private Network network;
     private JTextField tfUsername;
@@ -25,9 +25,7 @@ public class RegistrationDialog extends JDialog {
     private JPanel panel;
     private GridBagConstraints cs;
 
-    private boolean registered;
-
-    public RegistrationDialog(JDialog parent, Network network) {
+    RegistrationDialog(JDialog parent, Network network) {
         super(parent, "Логин", true);
         this.network = network;
 
@@ -68,40 +66,21 @@ public class RegistrationDialog extends JDialog {
 
         pfPasswordRepeat = new JPasswordField(20);
         addComponent(pfPasswordRepeat, 1, row, 2);
+        pfPasswordRepeat.addActionListener(e -> registerNewUser());
 
         panel.setBorder(new LineBorder(Color.GRAY));
 
         btnRegistration = new JButton("Регистрация");
+        btnRegistration.isDefaultButton();
         btnCancel = new JButton("Отмена");
 
         JPanel bp = new JPanel();
 
         bp.add(btnRegistration);
-        btnRegistration.addActionListener(e -> {
-            try {
-                network.addUser(tfLogin.getText(), String.valueOf(pfPassword.getPassword()), tfUsername.getText());
-                //registered = true;
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(RegistrationDialog.this,
-                        "Ошибка сети",
-                        "Регистрация",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            } catch (AuthException ex) {
-                JOptionPane.showMessageDialog(RegistrationDialog.this,
-                        "Ошибка регистрации" + ex.getMessage(),
-                        "Регистрация",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            dispose();
-        });
+        btnRegistration.addActionListener(e -> registerNewUser());
 
         bp.add(btnCancel);
-        btnCancel.addActionListener(e -> {
-            registered = false;
-            dispose();
-        });
+        btnCancel.addActionListener(e -> dispose());
 
         getContentPane().add(panel, BorderLayout.CENTER);
         getContentPane().add(bp, BorderLayout.PAGE_END);
@@ -118,16 +97,36 @@ public class RegistrationDialog extends JDialog {
         panel.add(component, cs);
     }
 
-    boolean isRegistered() {
-        return registered;
-    }
-
     String getLogin() {
         return tfLogin.getText();
     }
 
-    String getPassword() {
-        return String.valueOf(pfPassword.getPassword());
+    private void registerNewUser() {
+        if (!String.valueOf(pfPassword.getPassword()).equals(String.valueOf(pfPasswordRepeat.getPassword()))) {
+            JOptionPane.showMessageDialog(RegistrationDialog.this,
+                    "Введенные пароли не совпадают",
+                    "Регистрация",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        try {
+            network.addUser(tfLogin.getText(), String.valueOf(pfPassword.getPassword()), tfUsername.getText());
+
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(RegistrationDialog.this,
+                    "Ошибка сети",
+                    "Регистрация",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        } catch (AuthException ex) {
+            JOptionPane.showMessageDialog(RegistrationDialog.this,
+                    "Ошибка регистрации" + ex.getMessage(),
+                    "Регистрация",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        dispose();
     }
+
 }
 

@@ -1,7 +1,9 @@
 package ru.geekbrains.network_chat.message;
 
-import ru.geekbrains.network_chat.ChatUser;
+import ru.geekbrains.network_chat.authorization.ChatUser;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,27 +24,30 @@ public final class MessagePatterns {
             patternConstructor(REG_PREFIX, "(\\w+) (\\w+) (\\w+)"));  // /reg login password name
     private static final String REG_RESULT_PATTERN = REG_PREFIX + " %s";
 
-    private static final String CONNECTED = "/connected";
+    public static final String CONNECTED = "/connected";
     public static final String CONNECTED_SEND = CONNECTED + " %s";
-    public static final Pattern CONNECTED_REC = Pattern.compile(patternConstructor(CONNECTED, "(\\w+)"));
+    private static final Pattern CONNECTED_REC;
 
-    public static final String DISCONNECTED = "/disconnect";
+    static {
+        CONNECTED_REC = Pattern.compile(patternConstructor(CONNECTED, "(\\w+)"));
+    }
+
+    public static final String DISCONNECTED = "/disconnected";
     public static final String DISCONNECTED_SEND = DISCONNECTED + " %s";
-    public static final Pattern DISCONNECTED_REC = Pattern.compile(patternConstructor(DISCONNECTED, "(\\w+)"));
+    private static final Pattern DISCONNECTED_REC = Pattern.compile(patternConstructor(DISCONNECTED, "(\\w+)"));
 
 
-    private static final String MESSAGE_PREFIX = "/w";
+    public static final String MESSAGE_PREFIX = "/w";
     public static final String MESSAGE_SEND_PATTERN = "/w %s %s %s";
     private static final Pattern MESSAGE_REC_PATTERN = Pattern.compile(
-            patternConstructor(MESSAGE_PREFIX, "(\\w+) (\\w+) (.+)"),
-            Pattern.MULTILINE);
+            patternConstructor(MESSAGE_PREFIX, "(\\w+) (\\w+) (.+)"), Pattern.MULTILINE);
 
-    //public static final String MESSAGE_PRINT_PATTERN = "%s %s     %s"; // login message
-    public static final String UPDATE_USERS_PATTERN = "/updusr";
-    public static final String USER_LIST_PATTERN = "/users %s"; // login
-    public static final String USER_EXIT_PATTERN = "/exit %s"; // login
+    public static final String USERS_PREFIX = "/users";
+    public static final String USERS_PATTERN = USERS_PREFIX + " %s"; // / users [login1, login2, ...]
+    private static final Pattern USERS_REC_PATTERN = Pattern.compile(
+            patternConstructor(USERS_PREFIX, "\\[(.+)]"));
 
-    private static final String EX_MESSAGE_PATTERN = "Unknown message pattern: %s%n";
+    public static final String EX_MESSAGE_PATTERN = "Unknown message pattern: %s%n";
 
     private static String patternConstructor(String prefix, String args) {
         return String.format("^%s%s%s", prefix, (args.equals("") ? "" : " "), args);
@@ -96,18 +101,28 @@ public final class MessagePatterns {
         }
     }
 
-    public static boolean isUserListPattern(String msg) {
-        String commandName = USER_LIST_PATTERN.split(" ")[0];
-        String[] parts = msg.split(" ");
-        return parts[0].equals(commandName);
-    }
+    public static Set<String> parseUserListMessage(String msg) {
+        Matcher matcher = USERS_REC_PATTERN.matcher(msg);
+        if (matcher.matches()) {
+            String userList = matcher.group(1);
+            Pattern loginPattern = Pattern.compile("(\\w+)");
+            matcher = loginPattern.matcher(userList);
+            Set<String> result = new HashSet<>();
 
-    public static boolean isEndMessage(String msg) {
-        return msg.equalsIgnoreCase("/end");
+            while (matcher.find()) {
+                result.add(matcher.group(1));
+            }
+            if (result.size() > 0) {
+                return result;
+            }
+        } else {
+            System.out.println("Unknown message pattern: " + msg);
+        }
+        return null;
     }
 
     private static String StringParameter(Pattern pattern, String msg) {
-        Matcher matcher = MESSAGE_REC_PATTERN.matcher(msg);
+        Matcher matcher = pattern.matcher(msg);
         if (matcher.matches()) {
             return matcher.group(1);
         } else {

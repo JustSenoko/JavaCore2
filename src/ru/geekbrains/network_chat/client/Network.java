@@ -1,18 +1,18 @@
-package ru.geekbrains.network_chat;
+package ru.geekbrains.network_chat.client;
 
 import ru.geekbrains.network_chat.authorization.AuthException;
-import ru.geekbrains.network_chat.message.MessagePatterns;
-import ru.geekbrains.network_chat.message.MessageReceiver;
 import ru.geekbrains.network_chat.message.TextMessage;
 
+import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Set;
 
 import static ru.geekbrains.network_chat.message.MessagePatterns.*;
 
-public class Network {
+public class Network implements Closeable {
 
     private Socket socket;
     private DataInputStream in;
@@ -32,18 +32,11 @@ public class Network {
         this.messageReceiver = messageReceiver;
 
         this.receiverThread = new Thread(() -> {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     String text = in.readUTF();
-                    TextMessage textMessage = MessagePatterns.parseSendMessage(text);
-                    if (textMessage != null) {
-                        messageReceiver.submitMessage(textMessage);
-                        continue;
-                    }
-                    if (MessagePatterns.isUserListPattern(text)) {
-                        messageReceiver.updateUserList(text);
-                    }
-
+                    System.out.printf("New message > %s%n", text);
+                    parseMessage(text);
                 } catch (IOException e) {
                     e.printStackTrace();
                     if (socket.isClosed()) {
@@ -59,9 +52,9 @@ public class Network {
         out = new DataOutputStream(socket.getOutputStream());
         in = new DataInputStream(socket.getInputStream());
 
-        sendMessage(String.format(AUTH_SEND_PATTERN , login, password));
+        sendMessage(String.format(AUTH_SEND_PATTERN, login, password));
         String response = in.readUTF();
-        if (response.equals(MessagePatterns.authResult(true))) {
+        if (response.equals(authResult(true))) {
             this.login = login;
             receiverThread.start();
         } else {
@@ -76,15 +69,8 @@ public class Network {
 
         sendMessage(String.format(REG_SEND_PATTERN, login, password, name));
         String response = in.readUTF();
-        if (!response.equals(MessagePatterns.regResult(true))) {
+        if (!response.equals(regResult(true))) {
             throw new AuthException("Пользователь с таким логином уже зарегистрирован");
-        }
-        response = in.readUTF();
-        if (response.equals(MessagePatterns.authResult(true))) {
-            this.login = login;
-            receiverThread.start();
-        } else {
-            throw new AuthException("Неверный логин/пароль");
         }
     }
 
@@ -105,12 +91,39 @@ public class Network {
         return login;
     }
 
-    public void updateUsersList() {
-        sendMessage(UPDATE_USERS_PATTERN);
+    @Override
+    public void close() {
+        this.receiverThread.interrupt();
+        sendMessage(DISCONNECTED);
     }
 
-    public void userExit() {
-        sendMessage(String.format(USER_EXIT_PATTERN, login));
-    }
+    private void parseMessage(String msg) {
+        String msgCommand = msg.split(" ")[0];
+        String userLogin;
 
+        switch (msgCommand) {
+            case MESSAGE_PREFIX:
+                TextMessage textMessage = parseSendMessage(msg);
+                if (textMessage != null) {
+                    messageReceiver.submitMessage(textMessage);
+                }
+                break;
+            case CONNECTED:
+                userLogin = parseConnectMessage(msg);
+                if (userLogin != null) {
+                    messageReceiver.userConnected(userLogin);
+                }
+                break;
+            case DISCONNECTED:
+                userLogin = parseDisconnectMessage(msg);
+                if (userLogin != null) {
+                    messageReceiver.userDisconnected(userLogin);
+                }
+                break;
+            case USERS_PREFIX:
+                Set<String> userList = parseUserListMessage(msg);
+                messageReceiver.updateUserList(userList);//userList.toArray());
+                break;
+        }
+    }
 }
